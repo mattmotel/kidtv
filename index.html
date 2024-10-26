@@ -30,9 +30,23 @@
         function playVideo(url) {
             const videoModal = document.getElementById('videoModal');
             const videoFrame = document.getElementById('videoFrame');
-            videoFrame.src = url;
+
+            // Add YouTube URL parameters for autoplay and disable related videos
+            videoFrame.src = `${url}?autoplay=1&rel=0&modestbranding=1`;
             videoModal.style.display = 'flex';
-            videoFrame.focus();
+
+            // Add event listener for video end
+            videoFrame.addEventListener('load', () => {
+                const iframeWindow = videoFrame.contentWindow;
+                iframeWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+            });
+
+            // Listen for messages from YouTube iframe about video status
+            window.addEventListener('message', (event) => {
+                if (event.data === '{"event":"onStateChange","info":0}') {  // "info:0" is the 'ended' state
+                    closeVideo();
+                }
+            });
         }
 
         function closeVideo() {
