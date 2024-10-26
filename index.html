@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Halloween PWA</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="grid" id="videoGrid"></div>
+    <div class="video-modal" id="videoModal">
+        <iframe id="videoFrame" frameborder="0" allow="autoplay; fullscreen"></iframe>
+    </div>
+
+    <script>
+        async function loadVideos() {
+            const response = await fetch('./videos.json');
+            const videos = await response.json();
+            const grid = document.getElementById('videoGrid');
+            videos.forEach((video, index) => {
+                const tile = document.createElement('div');
+                tile.classList.add('tile');
+                tile.innerHTML = `<div class="letter">${video.letter}</div><div class="description">${video.description}</div>`;
+                tile.addEventListener('click', () => playVideo(video.videoUrl));
+                grid.appendChild(tile);
+            });
+        }
+    </script>
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js")
+            .then((registration) => {
+                console.log("Service Worker registered with scope:", registration.scope);
+            }).catch((error) => {
+                console.log("Service Worker registration failed:", error);
+            });
+        }
+    </script>
+</body>
+</html>
